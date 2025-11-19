@@ -1,0 +1,197 @@
+{
+  "info": {
+    "name": "MyStay API",
+    "_postman_id": "6c9b0a46-b7f4-4e0b-8e83-collection",
+    "description": "Postman collection for Auth and User services.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register Customer",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"phone\": \"+15550000001\",\n  \"email\": \"john@example.com\",\n  \"pin\": \"1234\"\n}"
+        },
+        "url": {
+          "raw": "{{auth_base_url}}/api/auth/register/customer",
+          "host": ["{{auth_base_url}}"],
+          "path": ["api", "auth", "register", "customer"]
+        }
+      }
+    },
+    {
+      "name": "Register Admin",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"firstName\": \"Alice\",\n  \"phone\": \"+15550000002\",\n  \"email\": \"admin@example.com\"\n}"
+        },
+        "url": {
+          "raw": "{{auth_base_url}}/api/auth/register/admin",
+          "host": ["{{auth_base_url}}"],
+          "path": ["api", "auth", "register", "admin"]
+        }
+      }
+    },
+    {
+      "name": "Login (PIN)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"+15550000001\",\n  \"pin\": \"1234\"\n}"
+        },
+        "url": {
+          "raw": "{{auth_base_url}}/api/auth/login",
+          "host": ["{{auth_base_url}}"],
+          "path": ["api", "auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Login (Biometric)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"+15550000001\",\n  \"biometricToken\": \"mock-token\"\n}"
+        },
+        "url": {
+          "raw": "{{auth_base_url}}/api/auth/login",
+          "host": ["{{auth_base_url}}"],
+          "path": ["api", "auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "Forgot PIN Request",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"+15550000001\"\n}"
+        },
+        "url": {
+          "raw": "{{auth_base_url}}/api/auth/forgot-pin/request",
+          "host": ["{{auth_base_url}}"],
+          "path": ["api", "auth", "forgot-pin", "request"]
+        }
+      }
+    },
+    {
+      "name": "Forgot PIN Verify",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"phone\": \"+15550000001\",\n  \"otp\": \"123456\",\n  \"newPin\": \"5678\"\n}"
+        },
+        "url": {
+          "raw": "{{auth_base_url}}/api/auth/forgot-pin/verify",
+          "host": ["{{auth_base_url}}"],
+          "path": ["api", "auth", "forgot-pin", "verify"]
+        }
+      }
+    },
+    {
+      "name": "Get Profile",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{user_base_url}}/api/users/{{uniqueId}}/profile",
+          "host": ["{{user_base_url}}"],
+          "path": ["api", "users", "{{uniqueId}}", "profile"]
+        }
+      }
+    },
+    {
+      "name": "Update Profile",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"city\": \"San Francisco\",\n  \"state\": \"CA\",\n  \"profession\": \"Developer\"\n}"
+        },
+        "url": {
+          "raw": "{{user_base_url}}/api/users/{{uniqueId}}/profile",
+          "host": ["{{user_base_url}}"],
+          "path": ["api", "users", "{{uniqueId}}", "profile"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "auth_base_url",
+      "value": "http://localhost:3001"
+    },
+    {
+      "key": "user_base_url",
+      "value": "http://localhost:3002"
+    },
+    {
+      "key": "jwt_token",
+      "value": ""
+    },
+    {
+      "key": "uniqueId",
+      "value": "CUST-EXAMPLE-123"
+    }
+  ]
+}
+
