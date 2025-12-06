@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PaymentMode {
+  cash
+  online
+  upi
+  bank_transfer
+}
+
+model Expense {
+  expense_id    BigInt      @id @default(autoincrement())
+  property_id   BigInt
+  admin_id      BigInt
+  category_id   BigInt
+  amount        Decimal     @db.Decimal(12, 2)
+  description   String?
+  invoice_url   String?
+  paid_to       String?
+  paid_mode     PaymentMode
+  expense_date  DateTime    @default(now())
+  month_year    String      @db.VarChar
+  created_at    DateTime    @default(now())
+  updated_at    DateTime    @updatedAt
+
+  category      ExpenseCategory @relation(fields: [category_id], references: [category_id])
+
+  @@index([property_id, month_year])
+  @@index([category_id])
+  @@map("expenses")
+}
+
+model ExpenseCategory {
+  category_id   BigInt    @id @default(autoincrement())
+  name          String    @unique
+  description   String?
+  created_at    DateTime  @default(now())
+
+  expenses      Expense[]
+
+  @@map("expense_categories")
+}
