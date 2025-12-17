@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { userService } from '../services/user.service';
+import { prisma } from '../lib/prisma';
+import bcrypt from 'bcrypt';
 
 export class UserController {
   /**
@@ -59,14 +61,60 @@ export class UserController {
         },
       });
     } catch (error) {
-      console.error('[User Controller] Error fetching user profile:', error);
+      console.error('Error fetching user profile:', error);
       return res.status(500).json({
         success: false,
-        message: 'Internal server error while fetching user profile',
+        message: 'Internal server error',
+      });
+    }
+  }
+
+  async setMpin(req: Request, res: Response): Promise<Response> {
+    try {
+      // @ts-ignore - Validated by middleware
+      const userId = req.user.userId;
+      const { mpin } = req.body;
+
+      // Hash new PIN
+      const saltRounds = 10;
+      const pinHash = await bcrypt.hash(mpin, saltRounds);
+
+      // Get current user to preserve other profileExtras
+      const user = await prisma.user.findUnique({
+        where: { id: BigInt(userId) },
+      });
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found',
+        });
+      }
+
+      const profileExtras = (user.profileExtras as Record<string, any>) || {};
+      profileExtras.pinHash = pinHash;
+
+      await prisma.user.update({
+        where: { id: BigInt(userId) },
+        data: {
+          profileExtras: profileExtras,
+        },
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: 'MPIN set successfully',
+      });
+    } catch (error) {
+      console.error('Error setting MPIN:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Internal server error',
       });
     }
   }
 }
 
 export const userController = new UserController();
+
 

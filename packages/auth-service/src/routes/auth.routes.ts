@@ -8,6 +8,8 @@ import {
   loginValidation,
   forgotPinRequestValidation,
   forgotPinVerifyValidation,
+  loginRequestOtpValidation,
+  loginVerifyOtpValidation,
   validate,
 } from '../middlewares/validation';
 
@@ -31,6 +33,18 @@ router.post(
   '/login',
   validate(loginValidation),
   loginController.login.bind(loginController)
+);
+
+router.post(
+  '/login/request-otp',
+  validate(loginRequestOtpValidation),
+  loginController.requestOTP.bind(loginController)
+);
+
+router.post(
+  '/login/verify-otp',
+  validate(loginVerifyOtpValidation),
+  loginController.verifyOTP.bind(loginController)
 );
 
 // Forgot PIN routes
