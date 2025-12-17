@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Template {
+  id        String   @id
+  name      String
+  channel   String
+  title     String?
+  body      String
+  variables Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("templates")
+}
+
+model NotificationAudit {
+  id               BigInt   @id @default(autoincrement())
+  templateId       String?
+  recipient        Json
+  channels         Json
+  status           String
+  providerResponse Json?
+  metadata         Json?
+  sentAt           DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("notification_audits")
+}
