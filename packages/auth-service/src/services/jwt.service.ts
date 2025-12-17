@@ -17,7 +17,7 @@ export class JWTService {
 
   sign(payload: JWTPayload): string {
     return jwt.sign(payload, this.secret, {
-      expiresIn: this.expiresIn,
+      expiresIn: this.expiresIn as any,
     });
   }
 

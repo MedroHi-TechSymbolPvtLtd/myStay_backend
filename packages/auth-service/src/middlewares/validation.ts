@@ -147,3 +147,40 @@ export const forgotPinVerifyValidation = [
     .matches(/^\d+$/)
     .withMessage('PIN must contain only digits'),
 ];
+
+export const loginRequestOtpValidation = [
+  body('phone')
+    .trim()
+    .notEmpty()
+    .withMessage('Phone is required')
+    .matches(/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/)
+    .withMessage('Invalid phone number format'),
+];
+
+export const loginVerifyOtpValidation = [
+  body('phone')
+    .trim()
+    .notEmpty()
+    .withMessage('Phone is required')
+    .matches(/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/)
+    .withMessage('Invalid phone number format'),
+  body('otp')
+    .trim()
+    .notEmpty()
+    .withMessage('OTP is required')
+    .isLength({ min: 6, max: 6 })
+    .withMessage('OTP must be 6 digits')
+    .matches(/^\d+$/)
+    .withMessage('OTP must contain only digits'),
+];
+
+export const setMpinValidation = [
+  body('mpin')
+    .trim()
+    .notEmpty()
+    .withMessage('MPIN is required')
+    .isLength({ min: 4, max: 4 })
+    .withMessage('MPIN must be exactly 4 digits')
+    .matches(/^\d+$/)
+    .withMessage('MPIN must contain only digits'),
+];
