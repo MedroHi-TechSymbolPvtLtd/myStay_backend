@@ -1,8 +1,8 @@
 import request from 'supertest';
-import app from '../src/app';
-import { prisma } from '../src/prisma';
+import app from '@/app';
+import { prisma } from '@/prisma';
 import jwt from 'jsonwebtoken';
-import { config } from '../src/config';
+import { config } from '@/config';
 
 const adminToken = jwt.sign({ id: 1, role: 'admin' }, config.jwtSecret);
 const userToken = jwt.sign({ id: 2, role: 'user' }, config.jwtSecret);
