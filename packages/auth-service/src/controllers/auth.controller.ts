@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import { userService } from '../services/user.service';
 import { jwtService } from '../services/jwt.service';
 import { cashfreeService } from '../services/cashfree.service';
+import { otpService } from '../services/otp.service';
 import { generateUniqueId } from '../utils/generateUniqueId';
 
 interface RegisterRequest {
@@ -17,15 +18,7 @@ interface RegisterRequest {
 export class AuthController {
   async registerCustomer(req: Request, res: Response): Promise<Response> {
     try {
-      const { firstName, lastName, phone, email, pin, aadhaarOtpToken }: RegisterRequest = req.body;
-
-      // Validate PIN is provided for customer
-      if (!pin) {
-        return res.status(400).json({
-          success: false,
-          message: 'PIN is required for customer registration',
-        });
-      }
+      const { firstName, lastName, phone, email, aadhaarOtpToken }: RegisterRequest = req.body;
 
       // Check if user already exists
       const existingUser = await userService.findUserByPhone(phone);
@@ -63,10 +56,6 @@ export class AuthController {
         // If Cashfree is disabled, continue with unverified status
       }
 
-      // Hash PIN
-      const saltRounds = 10;
-      const pinHash = await bcrypt.hash(pin, saltRounds);
-
       // Generate unique ID
       const uniqueId = generateUniqueId('customer');
 
@@ -78,26 +67,16 @@ export class AuthController {
         lastName,
         phone,
         email,
-        pinHash,
         aadhaarStatus,
       });
 
-      // Generate JWT token
-      const token = jwtService.sign({
-        userId: user.id.toString(),
-        uniqueId: user.uniqueId,
-        userType: user.userType,
-      });
+      // Generate OTP for verification
+      const otp = await otpService.generateOTP(phone);
 
       return res.status(201).json({
         success: true,
-        token,
-        user: {
-          uniqueId: user.uniqueId,
-          firstName: user.firstName,
-          phone: user.phone,
-          userType: user.userType,
-        },
+        message: 'User registered successfully. Please verify OTP.',
+        ...(process.env.NODE_ENV === 'development' && { otp }),
       });
     } catch (error) {
       console.error('Customer registration error:', error);
