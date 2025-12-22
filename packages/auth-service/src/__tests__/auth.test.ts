@@ -4,6 +4,7 @@ import { prisma } from '../lib/prisma';
 import { otpService } from '../services/otp.service';
 import { firebaseService } from '../services/firebase.service';
 import bcrypt from 'bcrypt';
+import { jwtService } from '../services/jwt.service';
 
 const app = createApp();
 
@@ -16,7 +17,7 @@ describe('Auth Service API', () => {
     await prisma.user.deleteMany({
       where: {
         phone: {
-          in: ['+15550000001', '+15550000002', '+15550000003'],
+          in: ['+15550000001', '+15550000002', '+15550000003', '+15550000004', '+15550000005'],
         },
       },
     });
@@ -26,22 +27,61 @@ describe('Auth Service API', () => {
     await prisma.$disconnect();
   });
 
-  it('registers a customer successfully', async () => {
+  it('registers a customer successfully and returns OTP', async () => {
     const response = await request(app).post('/api/auth/register/customer').send({
       firstName: 'Test',
       lastName: 'Customer',
       phone: '+15550000001',
       email: 'customer1@example.com',
-      pin: '1234',
     });
 
     expect(response.status).toBe(201);
     expect(response.body.success).toBe(true);
-    expect(response.body.token).toBeDefined();
-    expect(response.body.user.userType).toBe('customer');
+    expect(response.body.otp).toBeDefined(); // Only in dev/test environment usually, but checking here implies we rely on that behavior
+    expect(response.body.message).toContain('OTP');
   });
 
-  it('allows login with PIN', async () => {
+  it('allows full flow: Register -> Verify OTP -> Set MPIN -> Login', async () => {
+    const phone = '+15550000005';
+
+    // 1. Register
+    const regRes = await request(app).post('/api/auth/register/customer').send({
+      firstName: 'Flow',
+      lastName: 'User',
+      phone: phone,
+      email: 'flow@example.com',
+    });
+    expect(regRes.status).toBe(201);
+    const otp = regRes.body.otp; // Assuming dev mode returns OTP
+
+    // 2. Verify OTP
+    const verifyRes = await request(app).post('/api/auth/login/verify-otp').send({
+      phone: phone,
+      otp: otp,
+    });
+    expect(verifyRes.status).toBe(200);
+    const token = verifyRes.body.token;
+    expect(token).toBeDefined();
+
+    // 3. Set MPIN
+    const mpinRes = await request(app)
+      .post('/api/auth/set-mpin')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        mpin: '4321',
+      });
+    expect(mpinRes.status).toBe(200);
+
+    // 4. Login with MPIN
+    const loginRes = await request(app).post('/api/auth/login').send({
+      phone: phone,
+      pin: '4321',
+    });
+    expect(loginRes.status).toBe(200);
+    expect(loginRes.body.token).toBeDefined();
+  });
+
+  it('allows login with PIN (legacy/pre-set user)', async () => {
     const pinHash = await bcrypt.hash('5678', 10);
     await prisma.user.create({
       data: {
@@ -66,15 +106,16 @@ describe('Auth Service API', () => {
   });
 
   it('supports forgot PIN flow end-to-end', async () => {
-    // Register
+    // Register (without PIN)
     await request(app).post('/api/auth/register/customer').send({
       firstName: 'Reset',
       phone: '+15550000003',
-      pin: '1111',
       email: 'reset@example.com',
     });
+    // Assume user somehow verified and set pin or just forgot it purely.
+    // For this test we need the user to exist.
 
-    // Request OTP
+    // Request OTP for forgot pin
     const requestOtpResponse = await request(app)
       .post('/api/auth/forgot-pin/request')
       .send({ phone: '+15550000003' });
@@ -132,4 +173,3 @@ describe('Auth Service API', () => {
     firebaseSpy.mockRestore();
   });
 });
-
