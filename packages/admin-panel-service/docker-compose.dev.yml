@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  admin-panel-service:
+    build: .
+    ports:
+      - "3009:3009"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env.example
+    environment:
+      - NODE_ENV=development
+    command: npm run dev

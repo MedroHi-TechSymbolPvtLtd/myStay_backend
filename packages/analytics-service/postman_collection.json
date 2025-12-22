@@ -1,0 +1,114 @@
+{
+    "info": {
+        "name": "Analytics Service",
+        "description": "API collection for myStay Analytics Service",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Health Check",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/health",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "health"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Admin Summary",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{jwt}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/api/analytics/admin/summary",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "analytics",
+                        "admin",
+                        "summary"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Monthly Trends",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{jwt}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/api/analytics/admin/monthly?year=2024",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "analytics",
+                        "admin",
+                        "monthly"
+                    ],
+                    "query": [
+                        {
+                            "key": "year",
+                            "value": "2024"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "name": "Property Overview",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{jwt}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/api/analytics/property/1/overview",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "analytics",
+                        "property",
+                        "1",
+                        "overview"
+                    ]
+                }
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:3008"
+        },
+        {
+            "key": "jwt",
+            "value": ""
+        }
+    ]
+}
