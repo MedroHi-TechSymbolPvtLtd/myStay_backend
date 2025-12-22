@@ -41,6 +41,7 @@ describe('AuthController', () => {
                     lastName: 'User',
                     phone: '+1234567890',
                     email: 'test@example.com',
+                    gender: 'Male',
                 },
             };
 
@@ -67,6 +68,7 @@ describe('AuthController', () => {
             expect(userService.createUser).toHaveBeenCalledWith(expect.objectContaining({
                 firstName: 'Test',
                 phone: '+1234567890',
+                sex: 'Male',
                 aadhaarStatus: 'unverified',
             }));
 

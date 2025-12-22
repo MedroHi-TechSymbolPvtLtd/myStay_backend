@@ -11,6 +11,7 @@ interface RegisterRequest {
   lastName?: string;
   phone: string;
   email?: string;
+  gender?: string;
   pin?: string;
   aadhaarOtpToken?: string;
 }
@@ -18,7 +19,7 @@ interface RegisterRequest {
 export class AuthController {
   async registerCustomer(req: Request, res: Response): Promise<Response> {
     try {
-      const { firstName, lastName, phone, email, aadhaarOtpToken }: RegisterRequest = req.body;
+      const { firstName, lastName, phone, email, gender, aadhaarOtpToken }: RegisterRequest = req.body;
 
       // Check if user already exists
       const existingUser = await userService.findUserByPhone(phone);
@@ -67,6 +68,7 @@ export class AuthController {
         lastName,
         phone,
         email,
+        sex: gender,
         aadhaarStatus,
       });
 

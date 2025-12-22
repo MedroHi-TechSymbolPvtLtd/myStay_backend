@@ -8,6 +8,7 @@ export interface CreateUserData {
   lastName?: string;
   phone: string;
   email?: string;
+  sex?: string;
   pinHash?: string;
   aadhaarStatus?: string;
 }
@@ -15,7 +16,7 @@ export interface CreateUserData {
 export class UserService {
   async createUser(data: CreateUserData): Promise<Prisma.UserGetPayload<{}>> {
     const profileExtras: Record<string, any> = {};
-    
+
     if (data.pinHash) {
       profileExtras.pinHash = data.pinHash;
     }
@@ -26,6 +27,7 @@ export class UserService {
         userType: data.userType,
         firstName: data.firstName,
         lastName: data.lastName,
+        sex: data.sex,
         phone: data.phone,
         email: data.email,
         aadhaarStatus: data.aadhaarStatus || 'unverified',
