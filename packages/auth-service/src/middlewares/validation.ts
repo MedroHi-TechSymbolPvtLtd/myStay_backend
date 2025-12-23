@@ -41,6 +41,11 @@ export const registerCustomerValidation = [
     .isEmail()
     .withMessage('Invalid email format')
     .normalizeEmail(),
+  body('gender')
+    .optional()
+    .trim()
+    .isIn(['Male', 'Female', 'Other'])
+    .withMessage('Gender must be Male, Female, or Other'),
   body('aadhaarOtpToken')
     .optional()
     .trim()

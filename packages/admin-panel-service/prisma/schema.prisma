@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  admin_id   BigInt            @id @default(autoincrement())
+  unique_id  String            @unique @default(uuid())
+  phone      String            @unique
+  email      String?           @unique
+  name       String
+  password   String
+  role       String            @default("admin") // super_admin, admin, manager
+  is_active  Boolean           @default(true)
+  created_at DateTime          @default(now())
+  updated_at DateTime          @updatedAt
+  permissions AdminPermissions?
+
+  @@map("admins")
+}
+
+model AdminPermissions {
+  id                    BigInt   @id @default(autoincrement())
+  admin_id              BigInt   @unique
+  canManageProperties   Boolean  @default(false)
+  canViewTransactions   Boolean  @default(false)
+  canViewExpenses       Boolean  @default(false)
+  canAccessAnalytics    Boolean  @default(false)
+  canSuspendUsers       Boolean  @default(false)
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+  
+  admin                 Admin    @relation(fields: [admin_id], references: [admin_id], onDelete: Cascade)
+
+  @@map("admin_permissions")
+}
