@@ -1,4 +1,4 @@
-name: Backend Auto Deploy (SSH - Stable)
+name: Backend Auto Deploy (Admin Panel)
 
 on:
   push:
@@ -17,12 +17,31 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to EC2
+      - name: Deploy Admin Panel Service
         run: |
           ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            set -e
+
             cd ~/myStay_backend
-            git pull origin main
+
+            # install root deps (monorepo)
             npm install
-            npm install -g pm2
-            pm2 restart myStay || pm2 start index.js --name myStay
+
+            # go to admin panel service
+            cd packages/admin-panel-service
+
+            # install service deps
+            npm install
+
+            # prisma (safe to run multiple times)
+            npx prisma generate || true
+
+            # build typescript
+            npm run build
+
+            # restart via pm2
+            pm2 delete admin-panel || true
+            pm2 start dist/server.js --name admin-panel
+
+            pm2 save
           EOF
