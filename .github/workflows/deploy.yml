@@ -1,4 +1,4 @@
-name: Backend Auto Deploy
+name: Backend Auto Deploy 
 
 on:
   push:
@@ -10,15 +10,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
       - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          script: |
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd ~/myStay_backend
             git pull origin main
             npm install
             npm install -g pm2
             pm2 restart myStay || pm2 start index.js --name myStay
+          EOF
