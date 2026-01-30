@@ -1,4 +1,4 @@
-name: Backend Auto Deploy 
+name: Backend Auto Deploy (Pure SSH)
 
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
 
       - name: Deploy to EC2
         run: |
-          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
             cd ~/myStay_backend
             git pull origin main
             npm install
