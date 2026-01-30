@@ -1,0 +1,40 @@
+name: Backend Auto Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            # go to home
+            cd ~
+
+            # clone if not exists
+            if [ ! -d "myStay_backend" ]; then
+              git clone https://github.com/MedroHi-TechSymbolPvtLtd/myStay_backend.git
+            fi
+
+            cd myStay_backend
+
+            # update code
+            git pull origin main
+
+            # install deps
+            npm install
+
+            # ensure pm2
+            npm install -g pm2
+
+            # start/restart app
+            pm2 restart myStay || pm2 start index.js --name myStay
